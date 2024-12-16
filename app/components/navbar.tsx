@@ -6,15 +6,32 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
+import { logout } from "../util/ApiUtils";
 
 export function NavBar() {
 
   const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useState(false)
 
+
+
+
   const handleAuth = () => {
-    setIsLoggedIn(!isLoggedIn)
-  }
+    if (isLoggedIn) {
+      logout()
+        .then(() => {
+          setIsLoggedIn(false);
+          router.push('/');
+        })
+        .catch((error) => {
+          console.error("Sign out failed", error);
+        });
+    } else {
+      setIsLoggedIn(true);
+    }
+  };
+
+
   const handleRegisterClick = () => {
     router.push('/register');
   };
@@ -54,7 +71,7 @@ export function NavBar() {
               </Button>
             )
           }
-         
+
         </div>
       </div>
     </nav>

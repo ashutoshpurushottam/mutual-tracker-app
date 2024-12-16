@@ -1,24 +1,22 @@
-import { Metadata } from "next"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { ArrowLeft } from 'lucide-react'
-import MutualFundPortfolio from "./MutualFundPortfolio"
+"use client"
+import { DashboardContent } from "./dashboard-content";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { ACCESS_TOKEN, ROUTES } from "../constants";
+import { AuthService } from "../util/ApiUtils";
+import { fetchPortfolios } from "../util/InvestmentUtil";
 
-
-export const metadata: Metadata = {
-  title: "Mutual Fund Portfolio Dashboard",
-  description: "View and manage your mutual fund investments",
-}
 
 export default function DashboardPage() {
+  const router = useRouter();
+  const [portfolios, setPortfolios] = useState<Portfolio[]>([]);
+
+  
+
   return (
-    <div className="container mx-auto py-10">
-      <Link href="/" passHref>
-        <Button variant="outline" size="sm" className="mb-4">
-          <ArrowLeft className="mr-2 h-4 w-4" /> Back to Home
-        </Button>
-      </Link>
-      <MutualFundPortfolio />
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-8">Your Investment Dashboard</h1>
+      <DashboardContent />
     </div>
-  )
+  );
 }

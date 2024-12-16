@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
+import axios from "axios"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -19,6 +20,13 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
+import { register } from "../util/ApiUtils"
+import { toast } from "@/hooks/use-toast"
+
+
+
+
+
 
 const formSchema = z.object({
   email: z.string().email({
@@ -27,6 +35,9 @@ const formSchema = z.object({
   password: z.string().min(8, {
     message: "Password must be at least 8 characters long.",
   }),
+  username: z.string().min(3, {
+    message: "Username must be at least 3 characters long."
+  })
 })
 
 export default function RegisterPage() {
@@ -38,26 +49,54 @@ export default function RegisterPage() {
     defaultValues: {
       email: "",
       password: "",
+      username: ""
     },
   })
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true)
-    // Simulate API call
-    setTimeout(() => {
-      console.log(values)
+    try {
+      const response = await register(values.email, values.password, values.username)
+      toast({
+        title: "Registration Successful",
+        description: "Your account has been created.",
+        variant: "default"
+      })
+      // Redirect to dashboard
+      router.push("/login")
+    } catch (error) {
+
+      console.log(error)
+      toast({
+        title: "Registration Failed",
+        description:  "An error occurred during registration",
+        variant: "destructive"
+      })
+    } finally {
       setIsLoading(false)
-      router.push("/dashboard")
-    }, 1000)
+    }
   }
 
   return (
     <AuthLayout
       title="Create an account"
-      description="Enter your email below to create your account"
+      description="Enter your details below to create your account"
     >
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <FormField
+            control={form.control}
+            name="username"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Username</FormLabel>
+                <FormControl>
+                  <Input placeholder="Choose a username" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <FormField
             control={form.control}
             name="email"
@@ -84,7 +123,11 @@ export default function RegisterPage() {
               </FormItem>
             )}
           />
-          <Button className="w-full" type="submit" disabled={isLoading}>
+          <Button
+            className="w-full"
+            type="submit"
+            disabled={isLoading}
+          >
             {isLoading ? "Creating account..." : "Create account"}
           </Button>
         </form>
@@ -99,7 +142,12 @@ export default function RegisterPage() {
           </span>
         </div>
       </div>
-      <Button variant="outline" type="button" disabled={isLoading} className="w-full">
+      <Button
+        variant="outline"
+        type="button"
+        disabled={isLoading}
+        className="w-full"
+      >
         Google
       </Button>
       <div className="text-center text-sm">
@@ -111,4 +159,3 @@ export default function RegisterPage() {
     </AuthLayout>
   )
 }
-

@@ -19,6 +19,9 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
+import { login } from "../util/ApiUtils"
+import { toast } from "@/hooks/use-toast"
+import { handleAuth } from "../components/navbar"
 
 const formSchema = z.object({
   email: z.string().email({
@@ -43,12 +46,45 @@ export default function LoginPage() {
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true)
-    // Simulate API call
-    setTimeout(() => {
-      console.log(values)
-      setIsLoading(false)
-      router.push("/dashboard")
-    }, 1000)
+    // Add your login logic here
+    login(values.email, values.password)
+      .then((response) => {
+       
+        toast({
+          title: "Login Successful",
+          description: "You have successfully logged in.",
+          variant: "default"
+        })
+        // Redirect to dashboard
+        router.push("/dashboard")
+      })
+      .catch((error) => {
+        if (error.response?.status === 401) {
+          toast({
+            title: "Login Failed",
+            description: "Invalid email or password.",
+            variant: "destructive"
+          })
+          return
+        }
+        if (error.response?.status === 404) {
+          toast({
+            title: "user not found",
+            description: "oops user not found.please signup",
+            variant: "destructive"
+          })
+          return
+        }
+        console.log(error)
+        toast({
+          title: "Login Failed",
+          description: error.response?.data?.message || "An error occurred during login",
+          variant: "destructive"
+        })
+      })
+      .finally(() => {
+        setIsLoading(false)
+      })
   }
 
   return (
