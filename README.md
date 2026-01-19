@@ -1,36 +1,108 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MutualTrack
 
-## Getting Started
+Next.js frontend for tracking Indian mutual fund investments — portfolio dashboard, fund research, CAMS upload, and auth.
 
-First, run the development server:
+> **Note:** This project is a **precursor / prototype** of the real MutualTrack application, which will be developed later. The local [`mock-api/`](mock-api/) backend is intentionally fake (in-memory) so the UI and flows can be built and demoed ahead of the production services.
+
+For local development it talks to a **fake dual-port API** in [`mock-api/`](mock-api/) (auth on `:8081`, investments/funds on `:8888`).
+
+## Stack
+
+- **Next.js 15** (App Router) + React 19 + TypeScript
+- Tailwind CSS + shadcn/ui
+- Axios, React Hook Form, Zod, Recharts, TanStack Table
+
+## Features
+
+- Register / sign in / sign out with session persisted in `localStorage`
+- Protected routes (`/dashboard`, `/portfolio/...`); guest-only `/login` and `/register`
+- Portfolio dashboard: totals, category/AMC charts, holdings table
+- Add investments manually or upload a CAMS report (mocked parse)
+- Fund search (Research) and performance charts by period
+- Scheme detail pages (NAV, AUM, returns, history)
+
+## Prerequisites
+
+- Node.js 18+
+- npm
+
+## Setup
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# Frontend
+npm install
+
+# Mock API (first time)
+npm --prefix mock-api install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Run locally
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Two terminals:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+# Terminal 1 — fake backend (:8081 auth, :8888 investments)
+npm run mock-api
 
-## Learn More
+# Terminal 2 — Next.js app
+npm run dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+Or together (macOS / Linux):
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm run dev:all
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Open [http://localhost:3000](http://localhost:3000).
 
-## Deploy on Vercel
+### Demo accounts
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+| Email | Password | Notes |
+|-------|----------|--------|
+| `demo@mutualtrack.com` | `password123` | Rich portfolio (~11 holdings) |
+| `empty@mutualtrack.com` | `password123` | Empty portfolio (add / CAMS flows) |
+| `active@mutualtrack.com` | `password123` | Smaller portfolio |
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+More API detail: [`mock-api/README.md`](mock-api/README.md).
+
+## Project structure
+
+```
+app/                 # Next.js App Router pages & UI
+  components/        # Navbar, auth guards, portfolio UI
+  dashboard/         # Portfolio dashboard
+  fund/              # Fund performance
+  login/ register/   # Auth pages
+  search/            # Fund research
+  util/              # Auth + investment API clients
+hooks/               # useAuth, useToast
+mock-api/            # Express fake backend (seeded data)
+components/ui/       # shadcn primitives
+```
+
+## Scripts
+
+| Script | Description |
+|--------|-------------|
+| `npm run dev` | Next.js on `:3000` |
+| `npm run mock-api` | Fake API on `:8081` and `:8888` |
+| `npm run dev:all` | Mock API + Next (backgrounds API) |
+| `npm run build` | Production build |
+| `npm run start` | Serve production build |
+| `npm run lint` | ESLint |
+
+## Backend URLs
+
+Configured in [`app/constants/index.tsx`](app/constants/index.tsx):
+
+| Service | Default |
+|---------|---------|
+| Auth | `http://localhost:8081/api/v1/auth` |
+| Investments / funds | `http://localhost:8888` |
+
+The mock API is **in-memory** — data resets when the process restarts. Swap these URLs when pointing at a real backend.
+
+## License
+
+Private project (`0.1.0`).
