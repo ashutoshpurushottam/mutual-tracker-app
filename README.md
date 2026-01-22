@@ -88,9 +88,22 @@ components/ui/       # shadcn primitives
 | `npm run dev` | Next.js on `:3000` |
 | `npm run mock-api` | Fake API on `:8081` and `:8888` |
 | `npm run dev:all` | Mock API + Next (backgrounds API) |
+| `npm test` | Run frontend (Vitest) + mock-api (`node --test`) suites |
+| `npm run test:app` | Frontend unit/component tests only |
+| `npm run test:api` | Mock API tests only |
+| `npm run test:watch` | Vitest watch mode |
 | `npm run build` | Production build |
 | `npm run start` | Serve production build |
 | `npm run lint` | ESLint |
+
+## Tests
+
+- **App:** Vitest + Testing Library — `AuthService`, portfolio math, `RequireAuth` / `GuestOnly`
+- **Mock API:** Node's built-in test runner + SuperTest — store, auth, portfolios, fund search
+
+```bash
+npm test
+```
 
 ## Backend URLs
 
