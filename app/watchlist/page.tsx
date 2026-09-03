@@ -9,12 +9,20 @@ import { WatchButton } from "@/app/components/watch-button"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { useAuth } from "@/hooks/use-auth"
+import { fetchFundDetails } from "@/app/util/InvestmentUtil"
 import {
   loadWatchlist,
   removeFromWatchlist,
   WatchlistItem,
   WATCHLIST_CHANGED_EVENT,
 } from "@/app/util/watchlist"
+
+type EnrichedItem = WatchlistItem & {
+  nav?: number
+  oneYear?: number
+  loading?: boolean
+  error?: boolean
+}
 
 export default function WatchlistPage() {
   return (
@@ -30,10 +38,30 @@ export default function WatchlistPage() {
 function WatchlistContent() {
   const { user } = useAuth()
   const userId = user?.userId ?? null
-  const [items, setItems] = useState<WatchlistItem[]>([])
+  const [items, setItems] = useState<EnrichedItem[]>([])
 
   const refresh = useCallback(() => {
-    setItems(loadWatchlist(userId))
+    const base = loadWatchlist(userId)
+    setItems(base.map((item) => ({ ...item, loading: true })))
+
+    Promise.all(
+      base.map(async (item) => {
+        try {
+          const details = await fetchFundDetails(item.schemeId)
+          return {
+            ...item,
+            schemeName: details.schemeName || item.schemeName,
+            amcName: details.amcName || item.amcName,
+            category: details.category || item.category,
+            nav: details.nav,
+            oneYear: details.returns.oneYear,
+            loading: false,
+          } satisfies EnrichedItem
+        } catch {
+          return { ...item, loading: false, error: true } satisfies EnrichedItem
+        }
+      })
+    ).then(setItems)
   }, [userId])
 
   useEffect(() => {
@@ -95,6 +123,32 @@ function WatchlistContent() {
                   <p className="text-sm text-muted-foreground">
                     {[item.amcName, item.category].filter(Boolean).join(" · ") || item.schemeId}
                   </p>
+                  <div className="flex flex-wrap gap-4 text-sm">
+                    {item.loading ? (
+                      <span className="text-muted-foreground">Loading quotes…</span>
+                    ) : item.error ? (
+                      <span className="text-muted-foreground">Details unavailable</span>
+                    ) : (
+                      <>
+                        <span>
+                          NAV:{" "}
+                          <strong>
+                            ₹{item.nav != null ? item.nav.toFixed(4) : "—"}
+                          </strong>
+                        </span>
+                        <span>
+                          1Y:{" "}
+                          <strong
+                            className={
+                              (item.oneYear ?? 0) >= 0 ? "text-green-600" : "text-red-600"
+                            }
+                          >
+                            {item.oneYear != null ? `${item.oneYear.toFixed(2)}%` : "—"}
+                          </strong>
+                        </span>
+                      </>
+                    )}
+                  </div>
                 </div>
                 <div className="flex shrink-0 flex-wrap gap-2">
                   <Button asChild variant="secondary" size="sm">
