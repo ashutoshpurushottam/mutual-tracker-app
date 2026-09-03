@@ -10,7 +10,7 @@ import { AuthService } from "../util/ApiUtils"
 import { uploadFile } from "../util/InvestmentUtil"
 
 interface UploadCAMSReportProps {
-    onUpload: (data: any) => void
+    onUpload: (data: unknown) => void | Promise<void>
     onClose: () => void
 }
 
