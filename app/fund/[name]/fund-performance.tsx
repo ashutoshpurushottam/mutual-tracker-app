@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Legend } from "recharts"
 import { fetchFundPerformance, FundPerformanceData } from "@/app/util/InvestmentUtil"
+import { NavBar } from "@/app/components/navbar"
 
 interface FundPerformanceProps {
   fundName: string
@@ -57,7 +58,9 @@ export default function FundPerformance({ fundName }: FundPerformanceProps) {
   const totalReturn = ((endValue - startValue) / startValue) * 100
 
   return (
-    <div className="container mx-auto py-10">
+    <>
+      <NavBar />
+      <div className="container mx-auto py-10 pt-24">
       <Card>
         <CardHeader>
           <CardTitle>{performanceData.schemeName || fundName}</CardTitle>
@@ -113,6 +116,7 @@ export default function FundPerformance({ fundName }: FundPerformanceProps) {
           </Tabs>
         </CardContent>
       </Card>
-    </div>
+      </div>
+    </>
   )
 }
