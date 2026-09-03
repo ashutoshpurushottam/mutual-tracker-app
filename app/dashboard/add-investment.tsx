@@ -20,7 +20,7 @@ interface InvestmentRow {
 }
 
 interface AddInvestmentFormProps {
-  onAddInvestment: (investments: InvestmentRow[]) => void
+  onAddInvestment: (investments: InvestmentRow[]) => void | Promise<void>
 }
 
 export default function AddInvestmentForm({ onAddInvestment }: AddInvestmentFormProps) {
