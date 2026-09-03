@@ -53,7 +53,7 @@ const columns: ColumnDef<Portfolio>[] = [
     cell: ({ row }) => {
       return (
         <Link 
-          href={`/portfolio/${row.original.id}`} 
+          href={`/portfolio/${row.original.schemeCode || row.original.id}`} 
           className="text-primary hover:underline"
         >
           {row.getValue('schemeName')}
