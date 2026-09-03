@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Legend } from "recharts"
 import { fetchFundPerformance, FundPerformanceData } from "@/app/util/InvestmentUtil"
+import { WatchButton } from "@/app/components/watch-button"
 import { NavBar } from "@/app/components/navbar"
 
 interface FundPerformanceProps {
@@ -62,11 +63,19 @@ export default function FundPerformance({ fundName }: FundPerformanceProps) {
       <NavBar />
       <div className="container mx-auto py-10 pt-24">
       <Card>
-        <CardHeader>
-          <CardTitle>{performanceData.schemeName || fundName}</CardTitle>
-          <CardDescription>
-            {performanceData.amcName} · {performanceData.category} · Performance over time
-          </CardDescription>
+        <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <CardTitle>{performanceData.schemeName || fundName}</CardTitle>
+            <CardDescription>
+              {performanceData.amcName} · {performanceData.category} · Performance over time
+            </CardDescription>
+          </div>
+          <WatchButton
+            schemeId={performanceData.schemeId || fundName}
+            schemeName={performanceData.schemeName || fundName}
+            amcName={performanceData.amcName}
+            category={performanceData.category}
+          />
         </CardHeader>
         <CardContent>
           <Tabs value={selectedPeriod} onValueChange={setSelectedPeriod}>

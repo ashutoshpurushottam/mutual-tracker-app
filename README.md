@@ -19,6 +19,7 @@ For local development it talks to a **fake dual-port API** in [`mock-api/`](mock
 - Portfolio dashboard: totals, category/AMC charts, holdings table
 - Add investments manually or upload a CAMS report (mocked parse)
 - Fund search (Research) and performance charts by period
+- Per-user **fund watchlist** saved from Research / fund pages
 - Scheme detail pages (NAV, AUM, returns, history)
 
 ## Prerequisites
@@ -75,6 +76,7 @@ app/                 # Next.js App Router pages & UI
   fund/              # Fund performance
   login/ register/   # Auth pages
   search/            # Fund research
+  watchlist/         # Saved funds
   util/              # Auth + investment API clients
 hooks/               # useAuth, useToast
 mock-api/            # Express fake backend (seeded data)
@@ -98,7 +100,7 @@ components/ui/       # shadcn primitives
 
 ## Tests
 
-- **App:** Vitest + Testing Library — `AuthService`, portfolio math, `RequireAuth` / `GuestOnly`
+- **App:** Vitest + Testing Library — `AuthService`, portfolio math, watchlist helpers, `RequireAuth` / `GuestOnly`
 - **Mock API:** Node's built-in test runner + SuperTest — store, auth, portfolios, fund search
 
 ```bash
