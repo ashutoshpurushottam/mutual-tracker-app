@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { ChevronRight } from 'lucide-react'
+import { WatchButton } from '@/app/components/watch-button'
 
 interface FundResult {
   schemeId: string
@@ -52,6 +53,7 @@ export function SearchResults() {
               <p className="text-sm text-muted-foreground">{fund.schemeId}</p>
             </Link>
             <div className="flex shrink-0 items-center gap-2">
+              <WatchButton schemeId={fund.schemeId} schemeName={fund.schemeName} />
               <Button asChild variant="ghost" size="icon">
                 <Link href={`/fund/${fund.schemeId}`}>
                   <ChevronRight className="h-4 w-4" />
