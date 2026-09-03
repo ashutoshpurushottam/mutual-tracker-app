@@ -76,3 +76,13 @@ npm run dev:all
 
 - `GET http://localhost:8081/health`
 - `GET http://localhost:8888/health`
+
+## Tests
+
+```bash
+# from repo root
+npm run test:api
+
+# or from this folder
+npm test
+```
