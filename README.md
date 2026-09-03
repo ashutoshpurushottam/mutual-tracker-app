@@ -17,6 +17,7 @@ For local development it talks to a **fake dual-port API** in [`mock-api/`](mock
 - Register / sign in / sign out with session persisted in `localStorage`
 - Protected routes (`/dashboard`, `/portfolio/...`); guest-only `/login` and `/register`
 - Portfolio dashboard: totals, category/AMC charts, holdings table
+- Category **allocation targets** with actual-vs-target drift (±2 pp on-target band)
 - Add investments manually or upload a CAMS report (mocked parse)
 - Fund search (Research) and performance charts by period
 - Scheme detail pages (NAV, AUM, returns, history)
@@ -98,7 +99,7 @@ components/ui/       # shadcn primitives
 
 ## Tests
 
-- **App:** Vitest + Testing Library — `AuthService`, portfolio math, `RequireAuth` / `GuestOnly`
+- **App:** Vitest + Testing Library — `AuthService`, portfolio math, allocation targets/drift, `RequireAuth` / `GuestOnly`
 - **Mock API:** Node's built-in test runner + SuperTest — store, auth, portfolios, fund search
 
 ```bash
