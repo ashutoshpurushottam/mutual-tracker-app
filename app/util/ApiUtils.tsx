@@ -35,6 +35,10 @@ export interface UserProfile {
         this.USER_PROFILE_KEY, 
         JSON.stringify(response.userProfile)
       );
+
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event("mutualtrack:auth-changed"));
+      }
     }
   
     // Retrieve user profile
@@ -78,6 +82,10 @@ export interface UserProfile {
       localStorage.removeItem(this.ACCESS_TOKEN_KEY);
       localStorage.removeItem(this.REFRESH_TOKEN_KEY);
       localStorage.removeItem(this.USER_PROFILE_KEY);
+
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event("mutualtrack:auth-changed"));
+      }
     }
   
     // Axios interceptor example
@@ -206,20 +214,26 @@ export const changePassword = async (oldPassword: string, newPassword: string) =
 
 // Function to handle user logout
 export const logout = async () => {
+  const accessToken = AuthService.getAccessToken();
   try {
-    const accessToken = AuthService.getAccessToken();
-    const response = await axios.post(
-      `${API_BASE_URL}/logout`,
-      {},
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
-    );
+    if (accessToken) {
+      const response = await axios.post(
+        `${API_BASE_URL}/logout`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      AuthService.logout();
+      return response.data;
+    }
     AuthService.logout();
-    return response.data;
+    return { message: "Logged out" };
   } catch (error) {
-    throw new Error('Logout failed');
+    // Clear local session even when the API is unreachable
+    AuthService.logout();
+    throw new Error("Logout failed");
   }
 };
