@@ -31,11 +31,49 @@ export function loadWatchlist(userId: string | null | undefined): WatchlistItem[
   }
 }
 
-export function saveWatchlist(userId: string, items: WatchlistItem[]): void {
+function saveWatchlist(userId: string, items: WatchlistItem[]): void {
   localStorage.setItem(watchlistStorageKey(userId), JSON.stringify(items))
   notifyWatchlistChanged()
 }
 
 export function isOnWatchlist(userId: string | null | undefined, schemeId: string): boolean {
   return loadWatchlist(userId).some((item) => item.schemeId === schemeId)
+}
+
+export function addToWatchlist(
+  userId: string,
+  item: Omit<WatchlistItem, "addedAt"> & { addedAt?: string }
+): WatchlistItem[] {
+  const current = loadWatchlist(userId)
+  if (current.some((entry) => entry.schemeId === item.schemeId)) {
+    return current
+  }
+  const next = [
+    {
+      schemeId: item.schemeId,
+      schemeName: item.schemeName,
+      amcName: item.amcName,
+      category: item.category,
+      addedAt: item.addedAt || new Date().toISOString(),
+    },
+    ...current,
+  ]
+  saveWatchlist(userId, next)
+  return next
+}
+
+export function removeFromWatchlist(userId: string, schemeId: string): WatchlistItem[] {
+  const next = loadWatchlist(userId).filter((item) => item.schemeId !== schemeId)
+  saveWatchlist(userId, next)
+  return next
+}
+
+export function toggleWatchlist(
+  userId: string,
+  item: Omit<WatchlistItem, "addedAt">
+): { items: WatchlistItem[]; added: boolean } {
+  if (isOnWatchlist(userId, item.schemeId)) {
+    return { items: removeFromWatchlist(userId, item.schemeId), added: false }
+  }
+  return { items: addToWatchlist(userId, item), added: true }
 }
