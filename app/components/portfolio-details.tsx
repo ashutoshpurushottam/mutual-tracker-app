@@ -6,58 +6,24 @@ import { Button } from '@/components/ui/button'
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
-
-interface PortfolioData {
-  schemeName: string
-  amcName: string
-  category: string
-  nav: number
-  aum: number
-  expenseRatio: number
-  riskLevel: string
-  returns: {
-    oneYear: number
-    threeYear: number
-    fiveYear: number
-  }
-  historicalData: { date: string; nav: number }[]
-}
-
-// Mock function to fetch portfolio data
-const fetchPortfolioData = async (schemeCode: string): Promise<PortfolioData> => {
-  // In a real application, this would be an API call
-  await new Promise(resolve => setTimeout(resolve, 1000)) // Simulate API delay
-  return {
-    schemeName: "Example Mutual Fund Scheme",
-    amcName: "Example AMC",
-    category: "Equity",
-    nav: 25.6789,
-    aum: 1000000000,
-    expenseRatio: 1.5,
-    riskLevel: "Moderate",
-    returns: {
-      oneYear: 12.5,
-      threeYear: 10.2,
-      fiveYear: 9.8
-    },
-    historicalData: [
-      { date: '2023-01-01', nav: 20.5 },
-      { date: '2023-02-01', nav: 21.2 },
-      { date: '2023-03-01', nav: 22.8 },
-      { date: '2023-04-01', nav: 23.5 },
-      { date: '2023-05-01', nav: 24.1 },
-      { date: '2023-06-01', nav: 25.6789 },
-    ]
-  }
-}
+import { fetchFundDetails, PortfolioDetailsData } from '@/app/util/InvestmentUtil'
 
 export function PortfolioDetails({ schemeCode }: { schemeCode: string }) {
-  const [portfolioData, setPortfolioData] = useState<PortfolioData | null>(null)
+  const [portfolioData, setPortfolioData] = useState<PortfolioDetailsData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    fetchPortfolioData(schemeCode)
-      .then(setPortfolioData)
+    setIsLoading(true)
+    fetchFundDetails(schemeCode)
+      .then((data) => {
+        setPortfolioData(data)
+        setError(null)
+      })
+      .catch(() => {
+        setPortfolioData(null)
+        setError('Error loading portfolio data')
+      })
       .finally(() => setIsLoading(false))
   }, [schemeCode])
 
@@ -65,8 +31,8 @@ export function PortfolioDetails({ schemeCode }: { schemeCode: string }) {
     return <div>Loading...</div>
   }
 
-  if (!portfolioData) {
-    return <div>Error loading portfolio data</div>
+  if (error || !portfolioData) {
+    return <div>{error || 'Error loading portfolio data'}</div>
   }
 
   return (
@@ -154,4 +120,3 @@ export function PortfolioDetails({ schemeCode }: { schemeCode: string }) {
     </div>
   )
 }
-
