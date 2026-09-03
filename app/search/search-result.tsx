@@ -45,21 +45,23 @@ export function SearchResults() {
   return (
     <div className="space-y-4">
       {results.map((fund) => (
-        <Card key="{fund.schemeId}" id={fund.schemeId} className="hover:shadow-md transition-shadow">
-          <Link href={`/fund/${fund.schemeId}`}>
-            <CardContent className="p-4 flex justify-between items-center">
-              <div>
-                <h2 className="text-lg font-semibold">{fund.schemeName}</h2>
-              </div>
-              <Button variant="ghost" size="icon">
-                <ChevronRight className="h-4 w-4" />
-                <span className="sr-only">View details</span>
+        <Card key={fund.schemeId} id={fund.schemeId} className="hover:shadow-md transition-shadow">
+          <CardContent className="p-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <Link href={`/fund/${fund.schemeId}`} className="min-w-0 flex-1 hover:underline">
+              <h2 className="text-lg font-semibold">{fund.schemeName}</h2>
+              <p className="text-sm text-muted-foreground">{fund.schemeId}</p>
+            </Link>
+            <div className="flex shrink-0 items-center gap-2">
+              <Button asChild variant="ghost" size="icon">
+                <Link href={`/fund/${fund.schemeId}`}>
+                  <ChevronRight className="h-4 w-4" />
+                  <span className="sr-only">View details</span>
+                </Link>
               </Button>
-            </CardContent>
-          </Link>
+            </div>
+          </CardContent>
         </Card>
       ))}
     </div>
   )
 }
-
