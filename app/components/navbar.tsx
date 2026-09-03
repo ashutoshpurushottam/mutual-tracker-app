@@ -34,6 +34,14 @@ export function NavBar() {
             >
               Research
             </Link>
+            {ready && isAuthenticated && (
+              <Link
+                href="/watchlist"
+                className="text-sm font-medium transition-colors hover:text-primary"
+              >
+                Watchlist
+              </Link>
+            )}
           </div>
         </div>
         <div className="flex items-center gap-4">
