@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
-import axios from "axios"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -22,6 +21,7 @@ import {
 } from "@/components/ui/form"
 import { register } from "../util/ApiUtils"
 import { toast } from "@/hooks/use-toast"
+import { GuestOnly } from "../components/guest-only"
 
 
 
@@ -78,6 +78,7 @@ export default function RegisterPage() {
   }
 
   return (
+    <GuestOnly>
     <AuthLayout
       title="Create an account"
       description="Enter your details below to create your account"
@@ -157,5 +158,6 @@ export default function RegisterPage() {
         </Link>
       </div>
     </AuthLayout>
+    </GuestOnly>
   )
 }
