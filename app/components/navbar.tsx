@@ -34,6 +34,12 @@ export function NavBar() {
             >
               Research
             </Link>
+            <Link
+              href="/compare"
+              className="text-sm font-medium transition-colors hover:text-primary"
+            >
+              Compare
+            </Link>
             {ready && isAuthenticated && (
               <Link
                 href="/watchlist"

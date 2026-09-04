@@ -70,6 +70,7 @@ describe("NavBar", () => {
     expect(await screen.findByText("MutualTrack")).toBeTruthy()
     expect(screen.getByText("Dashboard")).toBeTruthy()
     expect(screen.getByText("Research")).toBeTruthy()
+    expect(screen.getByText("Compare")).toBeTruthy()
   })
 
   it("shows Sign In for guests and routes to /login", async () => {

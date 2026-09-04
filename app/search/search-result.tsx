@@ -53,6 +53,9 @@ export function SearchResults() {
               <p className="text-sm text-muted-foreground">{fund.schemeId}</p>
             </Link>
             <div className="flex shrink-0 items-center gap-2">
+              <Button asChild variant="outline" size="sm">
+                <Link href={`/compare?ids=${encodeURIComponent(fund.schemeId)}`}>Compare</Link>
+              </Button>
               <WatchButton schemeId={fund.schemeId} schemeName={fund.schemeName} />
               <Button asChild variant="ghost" size="icon">
                 <Link href={`/fund/${fund.schemeId}`}>
