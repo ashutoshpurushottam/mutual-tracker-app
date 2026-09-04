@@ -5,8 +5,21 @@ import { Bar, BarChart, Cell, Legend, Pie, PieChart, ResponsiveContainer, Toolti
 import { PortfolioTable } from "../components/portfolio-table"
 import { Portfolio } from "../util/InvestmentUtil"
 import { AllocationTargetsPanel } from "../components/allocation-targets"
+import { TransactionHistoryPanel } from "../components/transaction-history"
 
-export function DashboardInvestmentDetails({ data }: { data: Portfolio[] }) {
+type DashboardInvestmentDetailsProps = {
+  data: Portfolio[]
+  userId?: string | null
+  onDeleteHolding?: (holding: Portfolio) => void | Promise<void>
+  deletingId?: string | null
+}
+
+export function DashboardInvestmentDetails({
+  data,
+  userId = null,
+  onDeleteHolding,
+  deletingId = null,
+}: DashboardInvestmentDetailsProps) {
   const totalInvestments = data.reduce((sum, row) => sum + row.investedValue, 0)
   const totalCurrentValue = data.reduce((sum, row) => sum + row.currentValue, 0)
   const totalGainLoss = totalCurrentValue - totalInvestments
@@ -130,9 +143,15 @@ export function DashboardInvestmentDetails({ data }: { data: Portfolio[] }) {
           <CardTitle>Portfolio Details</CardTitle>
         </CardHeader>
         <CardContent>
-          <PortfolioTable data={data} />
+          <PortfolioTable
+            data={data}
+            onDeleteHolding={onDeleteHolding}
+            deletingId={deletingId}
+          />
         </CardContent>
       </Card>
+
+      {userId ? <TransactionHistoryPanel userId={userId} /> : null}
     </div>
   )
 }
