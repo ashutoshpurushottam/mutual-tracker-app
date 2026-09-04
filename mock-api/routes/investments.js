@@ -17,6 +17,12 @@ function createInvestmentsRouter(store) {
     return res.json(portfolios);
   });
 
+  router.get("/users/:userId/transactions", (req, res) => {
+    const txns = store.getTransactions(req.params.userId);
+    if (!txns) return res.status(404).json({ message: "User not found" });
+    return res.json(txns);
+  });
+
   router.post("/users/:userId/upload", upload.single("file"), (req, res) => {
     const result = store.simulateCamsUpload(req.params.userId);
     if (!result) return res.status(404).json({ message: "User not found" });
