@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useMemo } from 'react'
 import {
   ColumnDef,
   flexRender,
@@ -9,7 +9,7 @@ import {
   SortingState,
   useReactTable,
 } from '@tanstack/react-table'
-import { ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react'
+import { ArrowUpDown, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Table,
@@ -20,140 +20,155 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import Link from 'next/link'
+import { Portfolio } from '@/app/util/InvestmentUtil'
 
-interface Portfolio {
-  id: string
-  userId: string
-  schemeName: string
-  amcName: string
-  folioNumber: string
-  units: number
-  investedValue: number
-  schemeCode: string | null
-  tradingsymbol: string
-  currentValue: number
-  lastUpdateDate: string
-  category: string
+type PortfolioTableProps = {
+  data: Portfolio[]
+  onDeleteHolding?: (holding: Portfolio) => void | Promise<void>
+  deletingId?: string | null
 }
 
-const columns: ColumnDef<Portfolio>[] = [
-  {
-    accessorKey: 'schemeName',
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          Scheme Name
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      )
-    },
-    cell: ({ row }) => {
-      return (
-        <Link 
-          href={`/portfolio/${row.original.schemeCode || row.original.id}`} 
-          className="text-primary hover:underline"
-        >
-          {row.getValue('schemeName')}
-        </Link>
-      )
-    },
-  },
-  {
-    accessorKey: 'amcName',
-    header: 'AMC Name',
-  },
-  {
-    accessorKey: 'category',
-    header: 'Category',
-  },
-  {
-    accessorKey: 'units',
-    header: 'Units',
-    cell: ({ row }) => {
-      const units = parseFloat(row.getValue('units'))
-      return <div className="text-right">{units.toFixed(2)}</div>
-    },
-  },
-  {
-    accessorKey: 'investedValue',
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          Invested Value
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      )
-    },
-    cell: ({ row }) => {
-      const amount = parseFloat(row.getValue('investedValue'))
-      const formatted = new Intl.NumberFormat('en-IN', {
-        style: 'currency',
-        currency: 'INR',
-      }).format(amount)
-      return <div className="text-right font-medium">{formatted}</div>
-    },
-  },
-  {
-    accessorKey: 'currentValue',
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          Current Value
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      )
-    },
-    cell: ({ row }) => {
-      const amount = parseFloat(row.getValue('currentValue'))
-      const formatted = new Intl.NumberFormat('en-IN', {
-        style: 'currency',
-        currency: 'INR',
-      }).format(amount)
-      return <div className="text-right font-medium">{formatted}</div>
-    },
-  },
-  {
-    accessorKey: 'gainLoss',
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          Gain/Loss
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      )
-    },
-    cell: ({ row }) => {
-      const investedValue = parseFloat(row.getValue('investedValue'))
-      const currentValue = parseFloat(row.getValue('currentValue'))
-      const gainLoss = currentValue - investedValue
-      const percentage = (gainLoss / investedValue) * 100
-      const formatted = new Intl.NumberFormat('en-IN', {
-        style: 'currency',
-        currency: 'INR',
-      }).format(gainLoss)
-      return (
-        <div className={`text-right font-medium ${gainLoss >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-          {formatted} ({percentage.toFixed(2)}%)
-        </div>
-      )
-    },
-  },
-]
-
-export function PortfolioTable({ data }: { data: Portfolio[] }) {
+export function PortfolioTable({
+  data,
+  onDeleteHolding,
+  deletingId = null,
+}: PortfolioTableProps) {
   const [sorting, setSorting] = React.useState<SortingState>([])
+
+  const columns = useMemo<ColumnDef<Portfolio>[]>(() => {
+    const base: ColumnDef<Portfolio>[] = [
+      {
+        accessorKey: 'schemeName',
+        header: ({ column }) => (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          >
+            Scheme Name
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        ),
+        cell: ({ row }) => (
+          <Link
+            href={`/portfolio/${row.original.schemeCode || row.original.id}`}
+            className="text-primary hover:underline"
+          >
+            {row.getValue('schemeName')}
+          </Link>
+        ),
+      },
+      { accessorKey: 'amcName', header: 'AMC Name' },
+      { accessorKey: 'category', header: 'Category' },
+      {
+        accessorKey: 'units',
+        header: 'Units',
+        cell: ({ row }) => (
+          <div className="text-right">{parseFloat(row.getValue('units')).toFixed(2)}</div>
+        ),
+      },
+      {
+        accessorKey: 'investedValue',
+        header: ({ column }) => (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          >
+            Invested Value
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        ),
+        cell: ({ row }) => {
+          const amount = parseFloat(row.getValue('investedValue'))
+          return (
+            <div className="text-right font-medium">
+              {new Intl.NumberFormat('en-IN', {
+                style: 'currency',
+                currency: 'INR',
+              }).format(amount)}
+            </div>
+          )
+        },
+      },
+      {
+        accessorKey: 'currentValue',
+        header: ({ column }) => (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          >
+            Current Value
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        ),
+        cell: ({ row }) => {
+          const amount = parseFloat(row.getValue('currentValue'))
+          return (
+            <div className="text-right font-medium">
+              {new Intl.NumberFormat('en-IN', {
+                style: 'currency',
+                currency: 'INR',
+              }).format(amount)}
+            </div>
+          )
+        },
+      },
+      {
+        id: 'gainLoss',
+        accessorFn: (row) => row.currentValue - row.investedValue,
+        header: ({ column }) => (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          >
+            Gain/Loss
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        ),
+        cell: ({ row }) => {
+          const investedValue = row.original.investedValue
+          const currentValue = row.original.currentValue
+          const gainLoss = currentValue - investedValue
+          const percentage = investedValue ? (gainLoss / investedValue) * 100 : 0
+          const formatted = new Intl.NumberFormat('en-IN', {
+            style: 'currency',
+            currency: 'INR',
+          }).format(gainLoss)
+          return (
+            <div
+              className={`text-right font-medium ${
+                gainLoss >= 0 ? 'text-green-500' : 'text-red-500'
+              }`}
+            >
+              {formatted} ({percentage.toFixed(2)}%)
+            </div>
+          )
+        },
+      },
+    ]
+
+    if (onDeleteHolding) {
+      base.push({
+        id: 'actions',
+        header: () => <div className="text-right">Actions</div>,
+        cell: ({ row }) => (
+          <div className="text-right">
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              disabled={deletingId === row.original.id}
+              onClick={() => onDeleteHolding(row.original)}
+              aria-label={`Delete ${row.original.schemeName}`}
+            >
+              <Trash2 className="h-4 w-4 text-red-500" />
+            </Button>
+          </div>
+        ),
+      })
+    }
+
+    return base
+  }, [onDeleteHolding, deletingId])
 
   const table = useReactTable({
     data,
@@ -161,9 +176,7 @@ export function PortfolioTable({ data }: { data: Portfolio[] }) {
     onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    state: {
-      sorting,
-    },
+    state: { sorting },
   })
 
   return (
@@ -172,28 +185,20 @@ export function PortfolioTable({ data }: { data: Portfolio[] }) {
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => {
-                return (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                  </TableHead>
-                )
-              })}
+              {headerGroup.headers.map((header) => (
+                <TableHead key={header.id}>
+                  {header.isPlaceholder
+                    ? null
+                    : flexRender(header.column.columnDef.header, header.getContext())}
+                </TableHead>
+              ))}
             </TableRow>
           ))}
         </TableHeader>
         <TableBody>
           {table.getRowModel().rows?.length ? (
             table.getRowModel().rows.map((row) => (
-              <TableRow
-                key={row.id}
-                data-state={row.getIsSelected() && "selected"}
-              >
+              <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id}>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -213,4 +218,3 @@ export function PortfolioTable({ data }: { data: Portfolio[] }) {
     </div>
   )
 }
-
