@@ -1,85 +1,170 @@
 # MutualTrack
 
-Next.js frontend for tracking Indian mutual fund investments — portfolio dashboard, fund research, CAMS upload, and auth.
+Prototype frontend for tracking **Indian mutual fund** investments: auth, portfolio dashboard, CAMS-style import, fund research, and scheme details.
 
-> **Note:** This project is a **precursor / prototype** of the real MutualTrack application, which will be developed later. The local [`mock-api/`](mock-api/) backend is intentionally fake (in-memory) so the UI and flows can be built and demoed ahead of the production services.
+> **Status:** This repo is a **precursor / UI prototype** of the real MutualTrack product (to be built later). Local development uses a **fake in-memory API** under [`mock-api/`](mock-api/) so screens and flows can be demoed without production backends.
 
-For local development it talks to a **fake dual-port API** in [`mock-api/`](mock-api/) (auth on `:8081`, investments/funds on `:8888`).
+**Live local URLs (default):**
 
-## Stack
+| App | URL |
+|-----|-----|
+| Next.js UI | [http://localhost:3000](http://localhost:3000) |
+| Auth API | [http://localhost:8081](http://localhost:8081) |
+| Investments / funds API | [http://localhost:8888](http://localhost:8888) |
 
-- **Next.js 15** (App Router) + React 19 + TypeScript
-- Tailwind CSS + shadcn/ui
-- Axios, React Hook Form, Zod, Recharts, TanStack Table
+---
 
-## Features
+## What it does
 
-- Register / sign in / sign out with session persisted in `localStorage`
-- Protected routes (`/dashboard`, `/portfolio/...`); guest-only `/login` and `/register`
-- Portfolio dashboard: totals, category/AMC charts, holdings table
-- Add investments manually or upload a CAMS report (mocked parse)
-- Fund search (Research) and performance charts by period
-- Scheme detail pages (NAV, AUM, returns, history)
+MutualTrack lets a signed-in user:
+
+1. **Create an account / sign in** — tokens and profile are stored in `localStorage`.
+2. **View a portfolio dashboard** — invested value, current value, gain/loss, category pie chart, AMC bar chart, holdings table.
+3. **Seed holdings** — empty portfolios can add rows manually or upload a CAMS-style report (mock parse appends sample funds).
+4. **Research funds** — search the seeded catalog and open performance charts (1M → since inception).
+5. **Open scheme details** — NAV, AUM, expense ratio, risk, returns, historical NAV.
+
+The UI is a **Next.js App Router** client that talks to two Express listeners that share one in-memory store.
+
+```mermaid
+flowchart LR
+  Browser["Browser :3000"]
+  Auth["Auth API :8081"]
+  Inv["Investments API :8888"]
+  Store["In-memory seed store"]
+
+  Browser -->|"signin / signup / logout"| Auth
+  Browser -->|"portfolios / CAMS / fund search"| Inv
+  Auth --> Store
+  Inv --> Store
+```
+
+---
+
+## Features (detail)
+
+### Authentication & session
+- Register (`/register`) and sign in (`/login`) against `POST /api/v1/auth/signup|signin`.
+- Session: `access_token`, `refresh_token`, and `user_profile` in `localStorage` via [`AuthService`](app/util/ApiUtils.tsx).
+- App-wide [`AuthProvider`](hooks/use-auth.tsx) hydrates session on load and syncs across tabs.
+- [`RequireAuth`](app/components/require-auth.tsx) guards `/dashboard` and `/portfolio/...` (redirect → `/login`).
+- [`GuestOnly`](app/components/guest-only.tsx) keeps signed-in users off `/login` and `/register` (redirect → `/dashboard`).
+- Navbar shows **Sign In** / **Sign Out** and the user’s display name from session.
+
+### Portfolio dashboard (`/dashboard`)
+- Loads holdings with `GET /users/:userId/portfolios`.
+- Summary cards: total invested, current value, gain/loss %.
+- Charts (Recharts): category distribution (pie), AMC-wise value (bar).
+- Sortable holdings table; scheme names link to `/portfolio/:schemeCode`.
+- **Empty state:** add-investment form and CAMS upload modal.
+- **Non-empty state:** charts/table + CAMS upload (add form currently only on empty state).
+
+### CAMS upload & manual add
+- Upload accepts PDF/CSV/Excel; mock API ignores file contents and appends a few seeded holdings.
+- Manual add posts investment rows to `POST /users/:userId/investments` (matches scheme by name/AMC when possible).
+
+### Research & fund pages
+- `/search` — query param `?query=` → `GET /fund/search`.
+- `/fund/[name]` — performance series for periods `1M`, `3M`, `1Y`, `3Y`, `5Y`, `SI`.
+- `/portfolio/[schemeCode]` — scheme metrics from `GET /fund/:schemeCode/details`.
+
+### Seeded catalog (mock API)
+- **53** schemes across major Indian AMCs (HDFC, ICICI, SBI, Axis, Nippon, Mirae, PPFAS, UTI, Kotak, Quant, Motilal Oswal, DSP, …).
+- Categories: **Equity**, **Debt**, **Hybrid**, **Index**.
+- Deterministic NAV histories and period returns (in-memory; reset on API restart).
+
+---
+
+## Tech stack
+
+| Layer | Choices |
+|-------|---------|
+| UI | Next.js **15** (App Router), React **19**, TypeScript |
+| Styling | Tailwind CSS, shadcn/ui (Radix), Lucide icons |
+| Forms / validation | React Hook Form, Zod, `@hookform/resolvers` |
+| Data / charts | Axios, Recharts, TanStack Table |
+| Auth UX | Client session + `RequireAuth` / `GuestOnly` |
+| Fake backend | Express, CORS, Multer, UUID ([`mock-api/`](mock-api/)) |
+| Tests | Vitest + Testing Library (app); `node --test` + SuperTest (API) |
+
+---
 
 ## Prerequisites
 
-- Node.js 18+
-- npm
+- **Node.js 18+** (20+ recommended)
+- **npm** 9+
+- Ports **3000**, **8081**, and **8888** free locally
+
+---
 
 ## Setup
 
 ```bash
-# Frontend
+git clone git@github.com:ashutoshpurushottam/mutual-tracker-app.git
+cd mutual-tracker-app
+
+# Frontend dependencies
 npm install
 
-# Mock API (first time)
+# Fake backend dependencies (first time)
 npm --prefix mock-api install
 ```
 
+---
+
 ## Run locally
 
-Two terminals:
+### Recommended: two terminals
 
 ```bash
-# Terminal 1 — fake backend (:8081 auth, :8888 investments)
+# Terminal 1 — auth :8081 + investments :8888
 npm run mock-api
 
-# Terminal 2 — Next.js app
+# Terminal 2 — Next.js
 npm run dev
 ```
 
-Or together (macOS / Linux):
+Then open [http://localhost:3000](http://localhost:3000).
+
+### One command (macOS / Linux)
 
 ```bash
 npm run dev:all
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+This backgrounds the mock API, then starts Next.js. Stop with `Ctrl+C` (you may still need to stop the background API process separately if it keeps running).
 
-### Demo accounts
+### Health checks
 
-| Email | Password | Notes |
-|-------|----------|--------|
-| `demo@mutualtrack.com` | `password123` | Rich portfolio (~11 holdings) |
-| `empty@mutualtrack.com` | `password123` | Empty portfolio (add / CAMS flows) |
-| `active@mutualtrack.com` | `password123` | Smaller portfolio |
+```bash
+curl -s http://localhost:8081/health
+curl -s http://localhost:8888/health
+```
+
+Both should return JSON like `{ "ok": true, "service": "auth" }` / `"investments"`.
+
+---
+
+## Demo accounts
+
+Use these after `npm run mock-api` is running:
+
+| Email | Password | What you’ll see |
+|-------|----------|-----------------|
+| `demo@mutualtrack.com` | `password123` | ~11 holdings — full dashboard charts/table |
+| `empty@mutualtrack.com` | `password123` | Empty portfolio — add form + CAMS upload |
+| `active@mutualtrack.com` | `password123` | Smaller portfolio (~4 holdings) |
+
+**Suggested walkthrough**
+
+1. Sign in as `demo@mutualtrack.com` → open **Dashboard**.
+2. Click a scheme name → portfolio detail + historical NAV.
+3. Open **Research**, search `flexi` or `nifty` → open a fund → switch period tabs.
+4. Sign out, sign in as `empty@mutualtrack.com` → add a holding or upload any dummy PDF as “CAMS”.
 
 More API detail: [`mock-api/README.md`](mock-api/README.md).
 
-## Project structure
-
-```
-app/                 # Next.js App Router pages & UI
-  components/        # Navbar, auth guards, portfolio UI
-  dashboard/         # Portfolio dashboard
-  fund/              # Fund performance
-  login/ register/   # Auth pages
-  search/            # Fund research
-  util/              # Auth + investment API clients
-hooks/               # useAuth, useToast
-mock-api/            # Express fake backend (seeded data)
-components/ui/       # shadcn primitives
-```
+---
 
 ## Scripts
 
@@ -95,26 +180,6 @@ components/ui/       # shadcn primitives
 | `npm run build` | Production build |
 | `npm run start` | Serve production build |
 | `npm run lint` | ESLint |
-
-## Tests
-
-- **App:** Vitest + Testing Library — `AuthService`, portfolio math, `RequireAuth` / `GuestOnly`
-- **Mock API:** Node's built-in test runner + SuperTest — store, auth, portfolios, fund search
-
-```bash
-npm test
-```
-
-## Backend URLs
-
-Configured in [`app/constants/index.tsx`](app/constants/index.tsx):
-
-| Service | Default |
-|---------|---------|
-| Auth | `http://localhost:8081/api/v1/auth` |
-| Investments / funds | `http://localhost:8888` |
-
-The mock API is **in-memory** — data resets when the process restarts. Swap these URLs when pointing at a real backend.
 
 ## License
 
