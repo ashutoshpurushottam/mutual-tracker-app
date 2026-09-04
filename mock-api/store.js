@@ -1,6 +1,7 @@
 const { v4: uuidv4 } = require("uuid");
 const { createSeedUsers, holdingFromScheme, CAMS_UPLOAD_SCHEME_IDS } = require("./data/users");
 const { getScheme, schemes } = require("./data/schemes");
+const { buildTransactionsForPortfolios } = require("./data/transactions");
 
 function createStore() {
   const users = createSeedUsers();
@@ -48,6 +49,12 @@ function createStore() {
   function getPortfolios(userId) {
     const user = findUserById(userId);
     return user ? [...user.portfolios] : [];
+  }
+
+  function getTransactions(userId) {
+    const user = findUserById(userId);
+    if (!user) return null;
+    return buildTransactionsForPortfolios(user.portfolios);
   }
 
   function addInvestments(userId, rows) {
@@ -222,6 +229,7 @@ function createStore() {
     resolveAccessToken,
     toUserProfile,
     getPortfolios,
+    getTransactions,
     addInvestments,
     updateInvestment,
     deleteInvestment,
