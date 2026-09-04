@@ -47,9 +47,10 @@ npm run dev:all
 
 ## Seed data
 
-- **53** Indian mutual fund schemes across HDFC, ICICI, SBI, Axis, Nippon, Mirae, PPFAS, UTI, Kotak, Quant, Motilal Oswal, DSP
+- **70+** Indian mutual fund schemes across HDFC, ICICI, SBI, Axis, Nippon, Mirae, PPFAS, UTI, Kotak, Quant, Motilal Oswal, DSP, Tata, Franklin, Bandhan, Canara Robeco, Invesco, Edelweiss, HSBC, Aditya Birla, PGIM, Sundaram
 - Categories: Equity, Debt, Hybrid, Index
 - Deterministic NAV history and period returns (`1M`–`SI`)
+- Synthetic SIP / purchase / redemption ledger per holding
 
 ## Endpoints
 
@@ -64,11 +65,13 @@ npm run dev:all
 ### Investments (`:8888`)
 
 - `GET /users/:userId/portfolios`
+- `GET /users/:userId/transactions` — synthetic SIP / purchase ledger
 - `POST /users/:userId/upload` — multipart `file` (fake CAMS parse)
 - `POST /users/:userId/investments` — `{ investments: [...] }`
 - `PUT /users/:userId/investments/:id`
 - `DELETE /users/:userId/investments/:id`
 - `GET /fund/search?query=`
+- `GET /fund/compare?ids=` — comma-separated scheme ids (max 3)
 - `GET /fund/:schemeId` — performance series by period
 - `GET /fund/:schemeId/details` — NAV, AUM, returns, history
 

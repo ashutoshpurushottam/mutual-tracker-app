@@ -94,6 +94,23 @@ describe("investments and funds HTTP API", () => {
     assert.ok(res.body.nav > 0)
   })
 
+  it("GET /fund/compare returns side-by-side details", async () => {
+    const res = await request(invApp)
+      .get("/fund/compare")
+      .query({ ids: "HDFC001,SBI001,PPFAS001" })
+      .expect(200)
+    assert.equal(res.body.length, 3)
+    assert.ok(res.body.every((f) => f.schemeId && f.nav > 0))
+  })
+
+  it("GET /users/:id/transactions returns a synthetic ledger", async () => {
+    const res = await request(invApp).get(`/users/${userId}/transactions`).expect(200)
+    assert.ok(Array.isArray(res.body))
+    assert.ok(res.body.length > 0)
+    assert.ok(res.body[0].type)
+    assert.ok(res.body[0].amount > 0)
+  })
+
   it("POST /users/:id/investments adds a holding", async () => {
     const emptyId = "user-empty-001"
     const before = await request(invApp).get(`/users/${emptyId}/portfolios`)

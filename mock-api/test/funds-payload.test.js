@@ -5,6 +5,7 @@ const {
   getScheme,
   getFundPerformancePayload,
   getFundDetailsPayload,
+  getComparePayload,
   searchSchemes,
 } = require("../data/schemes")
 
@@ -52,5 +53,13 @@ describe("fund performance payloads", () => {
     const ids = schemes.map((s) => s.schemeId)
     assert.equal(new Set(ids).size, ids.length)
     assert.equal(getScheme(ids[0]).schemeId, ids[0])
+    assert.ok(ids.length >= 70)
+  })
+
+  it("compare payload returns up to three fund details", () => {
+    const payload = getComparePayload("HDFC001,SBI001,UNKNOWN,PPFAS001")
+    assert.equal(payload.length, 3)
+    assert.equal(payload[0].schemeId, "HDFC001")
+    assert.ok(payload.every((f) => f.schemeName && f.nav > 0))
   })
 })
