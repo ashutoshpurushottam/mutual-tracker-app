@@ -19,10 +19,11 @@ Prototype frontend for tracking **Indian mutual fund** investments: auth, portfo
 MutualTrack lets a signed-in user:
 
 1. **Create an account / sign in** — tokens and profile are stored in `localStorage`.
-2. **View a portfolio dashboard** — invested value, current value, gain/loss, category pie chart, AMC bar chart, holdings table.
-3. **Seed holdings** — empty portfolios can add rows manually or upload a CAMS-style report (mock parse appends sample funds).
-4. **Research funds** — search the seeded catalog and open performance charts (1M → since inception).
-5. **Open scheme details** — NAV, AUM, expense ratio, risk, returns, historical NAV.
+2. **View a portfolio dashboard** — invested value, current value, gain/loss, category pie chart, AMC bar chart, holdings table, allocation targets, and transaction/SIP history.
+3. **Manage holdings** — add investments anytime or upload a CAMS-style report; delete holdings from the table.
+4. **Research funds** — search the seeded catalog, open performance charts, and save a personal watchlist.
+5. **Compare funds** — side-by-side NAV, AUM, expense ratio, and returns for 2–3 schemes.
+6. **Open scheme details** — NAV, AUM, expense ratio, risk, returns, historical NAV.
 
 The UI is a **Next.js App Router** client that talks to two Express listeners that share one in-memory store.
 
@@ -55,23 +56,26 @@ flowchart LR
 - Loads holdings with `GET /users/:userId/portfolios`.
 - Summary cards: total invested, current value, gain/loss %.
 - Charts (Recharts): category distribution (pie), AMC-wise value (bar).
-- Sortable holdings table; scheme names link to `/portfolio/:schemeCode`.
-- **Empty state:** add-investment form and CAMS upload modal.
-- **Non-empty state:** charts/table + CAMS upload (add form currently only on empty state).
+- Allocation targets panel (local goals vs current mix).
+- Sortable holdings table with delete actions; scheme names link to `/portfolio/:schemeCode`.
+- Transaction & SIP history panel from `GET /users/:userId/transactions`.
+- **Add investment** and **CAMS upload** available from empty and non-empty states.
 
 ### CAMS upload & manual add
 - Upload accepts PDF/CSV/Excel; mock API ignores file contents and appends a few seeded holdings.
 - Manual add posts investment rows to `POST /users/:userId/investments` (matches scheme by name/AMC when possible).
 
-### Research & fund pages
-- `/search` — query param `?query=` → `GET /fund/search`.
+### Research, watchlist & compare
+- `/search` — query param `?query=` → `GET /fund/search`; watch and compare actions on results.
+- `/watchlist` — localStorage-backed list of saved schemes (signed-in).
+- `/compare?ids=` — compare 2–3 schemes on NAV, AUM, expense, and returns.
 - `/fund/[name]` — performance series for periods `1M`, `3M`, `1Y`, `3Y`, `5Y`, `SI`.
 - `/portfolio/[schemeCode]` — scheme metrics from `GET /fund/:schemeCode/details`.
 
 ### Seeded catalog (mock API)
-- **53** schemes across major Indian AMCs (HDFC, ICICI, SBI, Axis, Nippon, Mirae, PPFAS, UTI, Kotak, Quant, Motilal Oswal, DSP, …).
+- **70+** schemes across major Indian AMCs (HDFC, ICICI, SBI, Axis, Nippon, Mirae, PPFAS, UTI, Kotak, Quant, Motilal Oswal, DSP, Tata, Franklin, Bandhan, Canara Robeco, …).
 - Categories: **Equity**, **Debt**, **Hybrid**, **Index**.
-- Deterministic NAV histories and period returns (in-memory; reset on API restart).
+- Deterministic NAV histories, period returns, and synthetic SIP ledgers (in-memory; reset on API restart).
 
 ---
 

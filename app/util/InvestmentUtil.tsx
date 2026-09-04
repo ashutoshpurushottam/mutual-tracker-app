@@ -132,3 +132,15 @@ export const fetchFundDetails = async (schemeCode: string): Promise<PortfolioDet
   )
   return response.data
 }
+
+export const fetchCompareFunds = async (
+  schemeIds: string[]
+): Promise<(PortfolioDetailsData & { schemeId: string })[]> => {
+  const ids = schemeIds.map((id) => id.trim()).filter(Boolean).slice(0, 3)
+  if (!ids.length) return []
+  const response = await axios.get<(PortfolioDetailsData & { schemeId: string })[]>(
+    `${INV_BASE}/fund/compare`,
+    { params: { ids: ids.join(",") } }
+  )
+  return response.data
+}

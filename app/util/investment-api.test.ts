@@ -3,6 +3,7 @@ import axios from "axios"
 import {
   addInvestments,
   deleteInvestment,
+  fetchCompareFunds,
   fetchFundDetails,
   fetchFundPerformance,
   fetchPortfolios,
@@ -89,6 +90,20 @@ describe("investment API helpers", () => {
       { headers: { "Content-Type": "application/json" } }
     )
     expect(created).toEqual([{ id: "new" }])
+  })
+
+  it("fetchCompareFunds requests the compare endpoint", async () => {
+    mockedAxios.get.mockResolvedValueOnce({
+      data: [{ schemeId: "HDFC001", nav: 10 }],
+    })
+
+    const result = await fetchCompareFunds(["HDFC001", "SBI001"])
+
+    expect(mockedAxios.get).toHaveBeenCalledWith("http://localhost:8888/fund/compare", {
+      params: { ids: "HDFC001,SBI001" },
+    })
+    expect(result[0].schemeId).toBe("HDFC001")
+    await expect(fetchCompareFunds([])).resolves.toEqual([])
   })
 
   it("updateInvestment, deleteInvestment, and uploadFile call the expected verbs", async () => {
