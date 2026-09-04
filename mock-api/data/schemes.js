@@ -1,5 +1,5 @@
 /**
- * Substantial fake Indian mutual fund catalog (~50 schemes)
+ * Substantial fake Indian mutual fund catalog (~70 schemes)
  * with deterministic NAV history and period performance series.
  */
 
@@ -166,6 +166,26 @@ const RAW_SCHEMES = [
   { schemeId: "DSP001", schemeName: "DSP Midcap Fund - Direct Growth", amcName: "DSP Mutual Fund", category: "Equity", tradingsymbol: "DSPMID", baseNav: 112.4, annualReturn: 15.2, inceptionYear: 2013, aumCr: 17000, expenseRatio: 0.75, riskLevel: "Very High" },
   { schemeId: "DSP002", schemeName: "DSP Nifty 50 Equal Weight Index Fund - Direct Growth", amcName: "DSP Mutual Fund", category: "Index", tradingsymbol: "DSPN50EW", baseNav: 22.5, annualReturn: 12.5, inceptionYear: 2019, aumCr: 1200, expenseRatio: 0.3, riskLevel: "High" },
   { schemeId: "DSP003", schemeName: "DSP Liquidity Fund - Direct Growth", amcName: "DSP Mutual Fund", category: "Debt", tradingsymbol: "DSPLIQ", baseNav: 3100.5, annualReturn: 6.1, inceptionYear: 2014, aumCr: 11000, expenseRatio: 0.15, riskLevel: "Low" },
+  // Tata / Franklin / Bandhan / Canara / Invesco / Edelweiss / HSBC
+  { schemeId: "TATA001", schemeName: "Tata Digital India Fund - Direct Growth", amcName: "Tata Mutual Fund", category: "Equity", tradingsymbol: "TATADIGI", baseNav: 42.8, annualReturn: 17.5, inceptionYear: 2016, aumCr: 9500, expenseRatio: 0.55, riskLevel: "Very High" },
+  { schemeId: "TATA002", schemeName: "Tata Large & Mid Cap Fund - Direct Growth", amcName: "Tata Mutual Fund", category: "Equity", tradingsymbol: "TATALMID", baseNav: 385.2, annualReturn: 14.2, inceptionYear: 2013, aumCr: 7200, expenseRatio: 0.7, riskLevel: "Very High" },
+  { schemeId: "TATA003", schemeName: "Tata Short Term Bond Fund - Direct Growth", amcName: "Tata Mutual Fund", category: "Debt", tradingsymbol: "TATAST", baseNav: 42.1, annualReturn: 6.7, inceptionYear: 2015, aumCr: 3200, expenseRatio: 0.3, riskLevel: "Low to Moderate" },
+  { schemeId: "FRANK001", schemeName: "Franklin India Flexi Cap Fund - Direct Growth", amcName: "Franklin Templeton Mutual Fund", category: "Equity", tradingsymbol: "FRANKFLEXI", baseNav: 1250.4, annualReturn: 13.8, inceptionYear: 2012, aumCr: 15000, expenseRatio: 0.95, riskLevel: "Very High" },
+  { schemeId: "FRANK002", schemeName: "Franklin India Smaller Companies Fund - Direct Growth", amcName: "Franklin Templeton Mutual Fund", category: "Equity", tradingsymbol: "FRANKSMALL", baseNav: 145.8, annualReturn: 16.5, inceptionYear: 2014, aumCr: 12500, expenseRatio: 0.9, riskLevel: "Very High" },
+  { schemeId: "BAND001", schemeName: "Bandhan Small Cap Fund - Direct Growth", amcName: "Bandhan Mutual Fund", category: "Equity", tradingsymbol: "BANDSMALL", baseNav: 38.6, annualReturn: 18.2, inceptionYear: 2020, aumCr: 9800, expenseRatio: 0.4, riskLevel: "Very High" },
+  { schemeId: "BAND002", schemeName: "Bandhan Nifty 50 Index Fund - Direct Growth", amcName: "Bandhan Mutual Fund", category: "Index", tradingsymbol: "BANDNIFTY", baseNav: 22.4, annualReturn: 11.4, inceptionYear: 2021, aumCr: 1100, expenseRatio: 0.2, riskLevel: "High" },
+  { schemeId: "CANARA001", schemeName: "Canara Robeco Bluechip Equity Fund - Direct Growth", amcName: "Canara Robeco Mutual Fund", category: "Equity", tradingsymbol: "CANARABLUE", baseNav: 52.8, annualReturn: 13.1, inceptionYear: 2014, aumCr: 14000, expenseRatio: 0.5, riskLevel: "High" },
+  { schemeId: "CANARA002", schemeName: "Canara Robeco Emerging Equities Fund - Direct Growth", amcName: "Canara Robeco Mutual Fund", category: "Equity", tradingsymbol: "CANARAEMERG", baseNav: 185.4, annualReturn: 15.6, inceptionYear: 2013, aumCr: 22000, expenseRatio: 0.55, riskLevel: "Very High" },
+  { schemeId: "INVESCO001", schemeName: "Invesco India Contra Fund - Direct Growth", amcName: "Invesco Mutual Fund", category: "Equity", tradingsymbol: "INVESCOCONTRA", baseNav: 98.5, annualReturn: 14.8, inceptionYear: 2014, aumCr: 14000, expenseRatio: 0.65, riskLevel: "Very High" },
+  { schemeId: "INVESCO002", schemeName: "Invesco India Arbitrage Fund - Direct Growth", amcName: "Invesco Mutual Fund", category: "Hybrid", tradingsymbol: "INVESCOARB", baseNav: 28.2, annualReturn: 6.8, inceptionYear: 2016, aumCr: 8500, expenseRatio: 0.35, riskLevel: "Low" },
+  { schemeId: "EDEL001", schemeName: "Edelweiss Mid Cap Fund - Direct Growth", amcName: "Edelweiss Mutual Fund", category: "Equity", tradingsymbol: "EDELMID", baseNav: 72.4, annualReturn: 16.8, inceptionYear: 2015, aumCr: 8500, expenseRatio: 0.45, riskLevel: "Very High" },
+  { schemeId: "EDEL002", schemeName: "Edelweiss Balanced Advantage Fund - Direct Growth", amcName: "Edelweiss Mutual Fund", category: "Hybrid", tradingsymbol: "EDELBAF", baseNav: 42.8, annualReturn: 11.2, inceptionYear: 2017, aumCr: 11000, expenseRatio: 0.5, riskLevel: "High" },
+  { schemeId: "HSBC001", schemeName: "HSBC Small Cap Fund - Direct Growth", amcName: "HSBC Mutual Fund", category: "Equity", tradingsymbol: "HSBCSMALL", baseNav: 68.9, annualReturn: 17.2, inceptionYear: 2015, aumCr: 14000, expenseRatio: 0.65, riskLevel: "Very High" },
+  { schemeId: "HSBC002", schemeName: "HSBC Value Fund - Direct Growth", amcName: "HSBC Mutual Fund", category: "Equity", tradingsymbol: "HSBCVALUE", baseNav: 95.2, annualReturn: 14.5, inceptionYear: 2014, aumCr: 12000, expenseRatio: 0.78, riskLevel: "Very High" },
+  { schemeId: "ADITYA001", schemeName: "Aditya Birla Sun Life Flexi Cap Fund - Direct Growth", amcName: "Aditya Birla Sun Life Mutual Fund", category: "Equity", tradingsymbol: "ABSLFLEXI", baseNav: 1450.2, annualReturn: 13.5, inceptionYear: 2012, aumCr: 21000, expenseRatio: 0.85, riskLevel: "Very High" },
+  { schemeId: "ADITYA002", schemeName: "Aditya Birla Sun Life Corporate Bond Fund - Direct Growth", amcName: "Aditya Birla Sun Life Mutual Fund", category: "Debt", tradingsymbol: "ABSLCORP", baseNav: 92.4, annualReturn: 6.9, inceptionYear: 2015, aumCr: 28000, expenseRatio: 0.3, riskLevel: "Low to Moderate" },
+  { schemeId: "PGIM001", schemeName: "PGIM India Midcap Opportunities Fund - Direct Growth", amcName: "PGIM India Mutual Fund", category: "Equity", tradingsymbol: "PGIMMID", baseNav: 58.6, annualReturn: 16.2, inceptionYear: 2015, aumCr: 9500, expenseRatio: 0.45, riskLevel: "Very High" },
+  { schemeId: "SUNDARAM001", schemeName: "Sundaram Mid Cap Fund - Direct Growth", amcName: "Sundaram Mutual Fund", category: "Equity", tradingsymbol: "SUNDARAMMID", baseNav: 820.5, annualReturn: 15.4, inceptionYear: 2013, aumCr: 11000, expenseRatio: 0.9, riskLevel: "Very High" },
 ];
 
 function enrichScheme(raw) {
@@ -244,6 +264,7 @@ function getFundDetailsPayload(schemeId) {
   const s = getScheme(schemeId);
   if (!s) return null;
   return {
+    schemeId: s.schemeId,
     schemeName: s.schemeName,
     amcName: s.amcName,
     category: s.category,
@@ -259,6 +280,20 @@ function getFundDetailsPayload(schemeId) {
   };
 }
 
+function getComparePayload(ids) {
+  const list = Array.isArray(ids) ? ids : String(ids || "").split(",");
+  const results = [];
+  for (const raw of list) {
+    const id = String(raw || "").trim();
+    if (!id) continue;
+    const details = getFundDetailsPayload(id);
+    if (!details) continue;
+    results.push(details);
+    if (results.length >= 3) break;
+  }
+  return results;
+}
+
 module.exports = {
   schemes,
   schemesById,
@@ -266,4 +301,5 @@ module.exports = {
   getScheme,
   getFundPerformancePayload,
   getFundDetailsPayload,
+  getComparePayload,
 };
