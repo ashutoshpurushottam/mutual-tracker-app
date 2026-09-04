@@ -3,6 +3,7 @@ const {
   searchSchemes,
   getFundPerformancePayload,
   getFundDetailsPayload,
+  getComparePayload,
   getScheme,
 } = require("../data/schemes");
 
@@ -18,6 +19,15 @@ function createFundsRouter() {
   router.get("/fund/search", (req, res) => {
     const results = searchSchemes(req.query.query);
     return res.json(results);
+  });
+
+  router.get("/fund/compare", (req, res) => {
+    const ids = req.query.ids;
+    const payload = getComparePayload(ids);
+    if (!payload.length) {
+      return res.status(400).json({ message: "Provide ids as comma-separated scheme ids" });
+    }
+    return res.json(payload);
   });
 
   router.get("/fund/:schemeId/details", (req, res) => {

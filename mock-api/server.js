@@ -49,6 +49,6 @@ authApp.listen(AUTH_PORT, () => {
 
 invApp.listen(INV_PORT, () => {
   console.log(`[mock-api] Investments API listening on http://localhost:${INV_PORT}`);
-  console.log(`           GET  /users/:id/portfolios | /fund/search | /fund/:id`);
+  console.log(`           GET  /users/:id/portfolios | /transactions | /fund/search | /fund/compare | /fund/:id`);
   console.log(`           Demo: demo@mutualtrack.com / password123`);
 });
