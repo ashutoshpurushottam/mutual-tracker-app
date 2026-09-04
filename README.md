@@ -232,16 +232,18 @@ Full mock endpoint list: [`mock-api/README.md`](mock-api/README.md).
 npm test
 ```
 
-**App (Vitest + Testing Library)**  
+**App (Vitest + Testing Library)** — 8 files / 32 tests  
 - `AuthService` session store / logout events  
-- Portfolio gain/loss helpers  
-- `RequireAuth` / `GuestOnly` redirect behavior  
+- Portfolio gain/loss helpers + Axios investment API helpers  
+- `RequireAuth` / `GuestOnly` and `NavBar` auth UI  
+- `useAuth` / `AuthProvider` hydration  
+- App route/API constants and `cn()` class helper  
 
-**Mock API (`node --test` + SuperTest)**  
-- Sign-in / signup / invalid credentials  
+**Mock API (`node --test` + SuperTest)** — 4 files / 31 tests  
+- Sign-in / signup / invalid credentials (HTTP)  
 - Portfolios, add investment, CAMS upload, delete  
-- Fund search, performance, details  
-- Scheme catalog size / search  
+- Fund search / performance / details payloads  
+- Seed users and scheme catalog integrity  
 
 ---
 
