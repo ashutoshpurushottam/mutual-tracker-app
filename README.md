@@ -162,7 +162,50 @@ Use these after `npm run mock-api` is running:
 3. Open **Research**, search `flexi` or `nifty` → open a fund → switch period tabs.
 4. Sign out, sign in as `empty@mutualtrack.com` → add a holding or upload any dummy PDF as “CAMS”.
 
-More API detail: [`mock-api/README.md`](mock-api/README.md).
+---
+
+## App routes
+
+| Route | Access | Purpose |
+|-------|--------|---------|
+| `/` | Public | Landing / hero |
+| `/login` | Guests only | Sign in |
+| `/register` | Guests only | Sign up |
+| `/dashboard` | Auth required | Portfolio overview |
+| `/portfolio/[schemeCode]` | Auth required | Scheme detail for a holding |
+| `/search` | Public | Fund search (Research) |
+| `/fund/[schemeId]` | Public | Fund performance charts |
+
+---
+
+## Project structure
+
+```
+mutual-tracker-app/
+├── app/                      # Next.js App Router
+│   ├── page.tsx              # Landing
+│   ├── layout.tsx            # Root layout + AuthProvider + Toaster
+│   ├── login/ · register/    # Auth screens
+│   ├── dashboard/            # Portfolio dashboard + CAMS / add forms
+│   ├── portfolio/[schemeCode]/
+│   ├── fund/[name]/          # Performance charts
+│   ├── search/               # Research UI
+│   ├── components/           # Navbar, guards, portfolio widgets
+│   ├── constants/            # API base URLs
+│   └── util/                 # AuthService, investment API helpers
+├── hooks/                    # useAuth, useToast
+├── components/ui/            # shadcn primitives
+├── mock-api/                 # Dual-port Express fake backend
+│   ├── server.js             # Listens on 8081 + 8888
+│   ├── store.js              # Users, tokens, portfolios
+│   ├── data/                 # Schemes + demo users
+│   ├── routes/               # auth, investments, funds
+│   └── test/                 # API / store tests
+├── vitest.config.ts
+└── package.json
+```
+
+Full mock endpoint list: [`mock-api/README.md`](mock-api/README.md).
 
 ---
 
@@ -170,17 +213,92 @@ More API detail: [`mock-api/README.md`](mock-api/README.md).
 
 | Script | Description |
 |--------|-------------|
-| `npm run dev` | Next.js on `:3000` |
+| `npm run dev` | Next.js dev server on `:3000` |
 | `npm run mock-api` | Fake API on `:8081` and `:8888` |
-| `npm run dev:all` | Mock API + Next (backgrounds API) |
-| `npm test` | Run frontend (Vitest) + mock-api (`node --test`) suites |
-| `npm run test:app` | Frontend unit/component tests only |
-| `npm run test:api` | Mock API tests only |
+| `npm run dev:all` | Start mock API in background, then Next |
+| `npm test` | App tests (Vitest) **then** mock-api tests |
+| `npm run test:app` | Frontend only |
+| `npm run test:api` | Mock API only |
 | `npm run test:watch` | Vitest watch mode |
 | `npm run build` | Production build |
 | `npm run start` | Serve production build |
 | `npm run lint` | ESLint |
 
+---
+
+## Tests
+
+```bash
+npm test
+```
+
+**App (Vitest + Testing Library)**  
+- `AuthService` session store / logout events  
+- Portfolio gain/loss helpers  
+- `RequireAuth` / `GuestOnly` redirect behavior  
+
+**Mock API (`node --test` + SuperTest)**  
+- Sign-in / signup / invalid credentials  
+- Portfolios, add investment, CAMS upload, delete  
+- Fund search, performance, details  
+- Scheme catalog size / search  
+
+---
+
+## Backend configuration
+
+Defaults live in [`app/constants/index.tsx`](app/constants/index.tsx):
+
+| Constant | Default |
+|----------|---------|
+| `API_BASE_URL` | `http://localhost:8081/api/v1/auth` |
+| `INVESTMENTS_API_BASE_URL` | `http://localhost:8081/api/v1/` *(declared; many investment calls still use `:8888` directly)* |
+
+Investment helpers in [`app/util/InvestmentUtil.tsx`](app/util/InvestmentUtil.tsx) call **`http://localhost:8888`** for portfolios, upload, and funds.
+
+**Important:** the mock store is **in-memory**. Restarting `npm run mock-api` resets users created via signup and any CAMS/manual holdings added in that session (seeded demo users return to their initial portfolios).
+
+When a real backend exists, point these URLs at it (and align path shapes with the contracts above).
+
+---
+
+## Troubleshooting
+
+### Dashboard / Research empty or “failed to fetch”
+- Confirm mock API is running (`curl` health endpoints above).
+- Sign in again so `userId` in `localStorage` matches a mock user (e.g. `user-demo-001`).
+
+### `npm install` fails with `recharts` / React 19 peer conflict
+- Prefer upgrading `recharts` to **≥ 2.15** (supports React 19 peers).
+- Temporary workaround: `npm install --legacy-peer-deps`.
+
+### Home page 404 / `EMFILE: too many open files`
+macOS file-watcher limits can break Next’s route discovery:
+
+```bash
+ulimit -n 65536
+rm -rf .next
+WATCHPACK_POLLING=true npm run dev
+```
+
+### Port already in use
+```bash
+lsof -i:3000,8081,8888
+# then kill the listed PIDs if safe
+```
+
+### Logout / Sign Out seems stuck
+Local session is cleared even if the logout API call fails. Hard-refresh if the navbar still looks stale.
+
+---
+
+## Repository & branches
+
+- Default branch: **`main`**
+- Feature work is expected via pull requests (see open PRs for allocation targets, watchlist, etc.).
+
+---
+
 ## License
 
-Private project (`0.1.0`).
+Private prototype (`0.1.0`). Not an investment advisory product — demo data only.
