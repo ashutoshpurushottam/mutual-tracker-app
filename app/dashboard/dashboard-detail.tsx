@@ -1,16 +1,18 @@
+"use client"
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Bar, BarChart, Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
 import { PortfolioTable } from "../components/portfolio-table"
 import { Portfolio } from "../util/InvestmentUtil"
-
-
+import { AllocationTargetsPanel } from "../components/allocation-targets"
 
 export function DashboardInvestmentDetails({ data }: { data: Portfolio[] }) {
- 
-  const totalInvestments = data.reduce((sum, data) => sum + data.investedValue, 0)
-  const totalCurrentValue = data.reduce((sum, data) => sum + data.currentValue, 0)
+  const totalInvestments = data.reduce((sum, row) => sum + row.investedValue, 0)
+  const totalCurrentValue = data.reduce((sum, row) => sum + row.currentValue, 0)
   const totalGainLoss = totalCurrentValue - totalInvestments
-  const gainLossPercentage = (totalGainLoss / totalInvestments) * 100
+  const gainLossPercentage = totalInvestments
+    ? (totalGainLoss / totalInvestments) * 100
+    : 0
 
   const categoryData = data.reduce((acc, portfolio) => {
     acc[portfolio.category] = (acc[portfolio.category] || 0) + portfolio.currentValue
@@ -19,8 +21,8 @@ export function DashboardInvestmentDetails({ data }: { data: Portfolio[] }) {
 
   const pieChartData = Object.entries(categoryData).map(([name, value]) => ({ name, value }))
 
-  const amcData = data.reduce((acc, data) => {
-    acc[data.amcName] = (acc[data.amcName] || 0) + data.currentValue
+  const amcData = data.reduce((acc, row) => {
+    acc[row.amcName] = (acc[row.amcName] || 0) + row.currentValue
     return acc
   }, {} as Record<string, number>)
 
@@ -28,10 +30,9 @@ export function DashboardInvestmentDetails({ data }: { data: Portfolio[] }) {
     .map(([name, value]) => ({ name, value }))
     .sort((a, b) => b.value - a.value)
 
-  const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff8042', '#0088FE']
+  const COLORS = ["#8884d8", "#82ca9d", "#ffc658", "#ff8042", "#0088FE"]
 
   return (
-
     <div className="space-y-6">
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         <Card>
@@ -55,7 +56,7 @@ export function DashboardInvestmentDetails({ data }: { data: Portfolio[] }) {
             <CardTitle>Total Gain/Loss</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className={`text-3xl font-bold ${totalGainLoss >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+            <p className={`text-3xl font-bold ${totalGainLoss >= 0 ? "text-green-500" : "text-red-500"}`}>
               ₹{totalGainLoss.toFixed(2)} ({gainLossPercentage.toFixed(2)}%)
             </p>
           </CardContent>
@@ -81,7 +82,7 @@ export function DashboardInvestmentDetails({ data }: { data: Portfolio[] }) {
                     dataKey="value"
                     label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                   >
-                    {pieChartData.map((entry, index) => (
+                    {pieChartData.map((_entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
@@ -103,13 +104,15 @@ export function DashboardInvestmentDetails({ data }: { data: Portfolio[] }) {
                   <XAxis type="number" />
                   <YAxis type="category" dataKey="name" width={150} />
                   <Tooltip
-                    formatter={(value) => new Intl.NumberFormat('en-IN', {
-                      style: 'currency',
-                      currency: 'INR'
-                    }).format(value as number)}
+                    formatter={(value) =>
+                      new Intl.NumberFormat("en-IN", {
+                        style: "currency",
+                        currency: "INR",
+                      }).format(value as number)
+                    }
                   />
                   <Bar dataKey="value" fill="#8884d8">
-                    {barChartData.map((entry, index) => (
+                    {barChartData.map((_entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Bar>
@@ -119,6 +122,9 @@ export function DashboardInvestmentDetails({ data }: { data: Portfolio[] }) {
           </CardContent>
         </Card>
       </div>
+
+      <AllocationTargetsPanel portfolios={data} />
+
       <Card>
         <CardHeader>
           <CardTitle>Portfolio Details</CardTitle>
